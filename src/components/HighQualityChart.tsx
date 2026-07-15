@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
+import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import type { ChartPoint } from '@/lib/chartData';
 
 /**
@@ -143,8 +144,10 @@ function buildOption(
       },
       tooltip: {
         trigger: 'item',
-        formatter: (p: { name: string; value: number; percent: number }) =>
-          `${p.name}: ${p.value.toFixed(1)} (${p.percent.toFixed(1)}%)`,
+        formatter: (p: unknown) => {
+          const cp = p as CallbackDataParams;
+          return `${cp.name}: ${(cp.value as number).toFixed(1)} (${((cp.percent as number) ?? 0).toFixed(1)}%)`;
+        },
         textStyle: { fontSize: labelSize },
       },
       legend: useLegend
@@ -181,8 +184,10 @@ function buildOption(
                 fontSize: labelSize,
                 fontWeight: 600,
                 color: '#111827',
-                formatter: (p: { name: string; percent: number }) =>
-                  `${p.name}\n${p.percent.toFixed(1)}%`,
+                formatter: (p: unknown) => {
+                  const cp = p as CallbackDataParams;
+                  return `${cp.name}\n${((cp.percent as number) ?? 0).toFixed(1)}%`;
+                },
               },
           labelLine: useLegend
             ? { show: false }
@@ -252,7 +257,7 @@ function buildOption(
             fontSize: labelSize - 1,
             fontWeight: 'bold',
             color: '#374151',
-            formatter: (p: { value: number }) => `${p.value.toFixed(1)}%`,
+            formatter: (p: unknown) => `${((p as CallbackDataParams).value as number).toFixed(1)}%`,
           },
         },
       ],
@@ -302,13 +307,13 @@ function buildOption(
           },
         })),
         barMaxWidth: exportMode ? 64 : 48,
-        label: {
+          label: {
           show: true,
           position: 'top',
           fontSize: labelSize - 1,
           fontWeight: 'bold',
           color: '#374151',
-          formatter: (p: { value: number }) => `${p.value.toFixed(1)}%`,
+          formatter: (p: unknown) => `${((p as CallbackDataParams).value as number).toFixed(1)}%`,
         },
       },
     ],
